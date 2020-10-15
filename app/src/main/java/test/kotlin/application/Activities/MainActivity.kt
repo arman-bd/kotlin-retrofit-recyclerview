@@ -27,28 +27,25 @@ class MainActivity : AppCompatActivity() {
 
         viewManager = LinearLayoutManager(this)
 
+        val request = ServiceBuilder.buildService(GitHub::class.java)
+        val call = request.listRepos("arman-bd")
 
-        bindings.myButton.setOnClickListener{
-            val request = ServiceBuilder.buildService(GitHub::class.java)
-            val call = request.listRepos("arman-bd")
+        call.enqueue(object : Callback<List<Repositories>>{
+            override fun onFailure(call: Call<List<Repositories>>, t: Throwable) {
+                Log.d("Response", "Error")
+            }
 
-            call.enqueue(object : Callback<List<Repositories>>{
-                override fun onFailure(call: Call<List<Repositories>>, t: Throwable) {
-                    Log.d("Response", "Error")
-                }
-
-                override fun onResponse(call: Call<List<Repositories>>, response: Response<List<Repositories>>) {
-                    if(response.body() != null){
-                        viewAdapter = RepositoryAdapter(response.body()!!)
-                        recyclerView = bindings.myRecycler.apply {
-                            setHasFixedSize(true)
-                            layoutManager = viewManager
-                            adapter = viewAdapter
-                        }
+            override fun onResponse(call: Call<List<Repositories>>, response: Response<List<Repositories>>) {
+                if(response.body() != null){
+                    viewAdapter = RepositoryAdapter(response.body()!!)
+                    recyclerView = bindings.myRecycler.apply {
+                        setHasFixedSize(true)
+                        layoutManager = viewManager
+                        adapter = viewAdapter
                     }
                 }
-            })
-        }
+            }
+        })
 
     }
 }
